@@ -1,0 +1,48 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "module": "commonjs",
+    "target": "es5",
+    "lib": ["es6", "es5"],
+    "sourceMap": false,
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "emitDecoratorMetadata": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "experimentalDecorators": true,
+    "baseUrl": "src",
+    "paths": {
+      "components/*": [
+        "components/*"
+      ],
+      "routers/*": [
+        "routers/*"
+      ],
+      "constants/*": [
+        "constants/*"
+      ],
+      "request/*": [
+        "request/*"
+      ],
+      "theme/*": [
+        "theme/*"
+      ],
+      "src/*": [
+        "*"
+      ],
+      "state/*": [
+        "state/*"
+      ],
+      "interface/*": [
+        "interface/*"
+      ],
+      "utility/*": [
+        "utility/*"
+      ],
+      "helper/*": [
+        "helper/*"
+      ],
+    }
+  },
+  "exclude": ["dist", "build"]
+}

@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "*.html": "html",
+    "algorithm": "cpp",
+    "__config": "cpp",
+    "unordered_map": "cpp"
+  }
+}
