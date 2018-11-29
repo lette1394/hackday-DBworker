@@ -6,6 +6,7 @@ export enum UserGrade {
 }
 
 export interface User {
+  email: string;
   nickname: string;
   grade: UserGrade;
 }
