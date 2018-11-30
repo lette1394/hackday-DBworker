@@ -1,6 +1,3 @@
-import { User } from "./interface";
-
-import { Notification } from "./interface/Notification";
 import { excuteQuery } from "./helper";
 
 export const registerRestHandler = ({ app, dbConn }) => {
@@ -53,7 +50,9 @@ export const registerRestHandler = ({ app, dbConn }) => {
         AND user.id = un.user_id
         AND noti.id = un.notification_id
         AND un.notification_status_id = ns.id
-        AND importance = ni.id;`;
+        AND importance = ni.id
+      ORDER BY created_at DESC; 
+      `;
 
     excuteQuery({ dbConn, QUERY, params: [email] })
       .then((result) => res.status(200).send(result))
@@ -88,4 +87,3 @@ export const registerRestHandler = ({ app, dbConn }) => {
       .catch(() => res.status(400).send());
   });
 };
- 

@@ -3,7 +3,7 @@ import { importanceResolver, excuteQuery } from "./helper";
 
 const redisMessageHandler = ({ dbConn }) => (channel, value) => {
   const {
-    id,
+    id: notification_id,
     title,
     message,
     createAt,
@@ -14,14 +14,14 @@ const redisMessageHandler = ({ dbConn }) => (channel, value) => {
   const saveNotification = () =>
     new Promise((resolve, reject) => {
       const QUERY = `INSERT INTO 
-      notification (id, title, message, importance, created_at) 
-      VALUES (?, ?, ?, ?, ?);`;
+        notification (id, title, message, importance, created_at) 
+        VALUES (?, ?, ?, ?, ?);`;
 
       excuteQuery({
         dbConn,
         QUERY,
         params: [
-          id,
+          notification_id,
           title,
           message,
           importanceResolver.get(importance),
@@ -44,10 +44,13 @@ const redisMessageHandler = ({ dbConn }) => (channel, value) => {
         .catch(() => reject());
     });
 
-  const saveNotificationToAllUserInGrade = (userIdList) =>
+  const saveNotificationToAllUserInGrade = (userIdList: any[]) =>
     new Promise((resolve, reject) => {
-      let values = [];
-      userIdList.forEach(({ user_id }) => values.push([user_id, id, 100]));
+      const values = userIdList.map(({ user_id }) => [
+        user_id,
+        notification_id,
+        100
+      ]);
 
       const QUERY = `INSERT INTO 
               user_notification (user_id, notification_id, notification_status_id)
@@ -61,6 +64,11 @@ const redisMessageHandler = ({ dbConn }) => (channel, value) => {
         .then(() => resolve())
         .catch(() => reject());
     });
+
+  Promise.resolve()
+    .then(() => saveNotification())
+    .then(() => getUserIdListFromGrade())
+    .then((userList: any[]) => saveNotificationToAllUserInGrade(userList));
 };
 
 export const handler = {
