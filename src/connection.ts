@@ -1,11 +1,12 @@
-import { ConnectionContext, User } from "./interface";
-import { Notification, NotificationImportance } from "./interface/Notification";
 import * as redis from "redis";
 import * as mysql from "mysql";
 import * as cors from "cors";
 import * as express from "express";
 import * as http from "http";
 import * as bodyParser from "body-parser";
+
+import { Notification } from "./interface/Notification";
+import { ConnectionContext, User } from "./interface";
 
 import {
   REDIS_HOST,
@@ -16,10 +17,12 @@ import {
   DB_HOST,
   DB_PASSWORD,
   DB_CHARSET,
-  DB_DATABASE
+  DB_DATABASE,
+  REDIS_MESSAGE
 } from "./constants";
+import { importanceResolver } from "./helper";
 
-export const getConnectionContext = (): ConnectionContext => {
+export const createConnectionContext = (): ConnectionContext => {
   const app: express.Express = express();
   app.use(cors());
   app.use(bodyParser.json());
@@ -58,7 +61,7 @@ export const subscribeOnRedis = ({
   redisClient,
   dbConn
 }: ConnectionContext) => {
-  redisClient.on("message", (channel, value) => {
+  redisClient.on(REDIS_MESSAGE, (channel, value) => {
     const {
       id,
       title,
@@ -68,14 +71,9 @@ export const subscribeOnRedis = ({
       grade
     }: Notification = JSON.parse(value);
 
-    const QUERY = `INSERT INTO notification (id, title, message, importance, created_at) 
+    const QUERY = `INSERT INTO 
+      notification (id, title, message, importance, created_at) 
       VALUES (?, ?, ?, ?, ?);`;
-
-    const importanceResolver = new Map();
-    importanceResolver.set(NotificationImportance.LOW, 100);
-    importanceResolver.set(NotificationImportance.MEDIUM, 200);
-    importanceResolver.set(NotificationImportance.HIGH, 300);
-    importanceResolver.set(NotificationImportance.URGENT, 400);
 
     dbConn.query(
       QUERY,

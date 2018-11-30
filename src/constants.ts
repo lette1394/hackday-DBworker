@@ -12,3 +12,5 @@ export const PORT: Number = 8999;
 
 export const NAMESPACE = "notification";
 export const EVENT_NOTIFICATION = `event-${NAMESPACE}`;
+
+export const REDIS_MESSAGE = "message";
