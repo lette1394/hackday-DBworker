@@ -21,6 +21,7 @@ import {
   REDIS_MESSAGE
 } from "./constants";
 import { importanceResolver } from "./helper";
+import { handler } from "./handler";
 
 export const createConnectionContext = (): ConnectionContext => {
   const app: express.Express = express();
@@ -61,48 +62,7 @@ export const subscribeOnRedis = ({
   redisClient,
   dbConn
 }: ConnectionContext) => {
-  redisClient.on(REDIS_MESSAGE, (channel, value) => {
-    const {
-      id,
-      title,
-      message,
-      createAt,
-      importance,
-      grade
-    }: Notification = JSON.parse(value);
-
-    const QUERY = `INSERT INTO 
-      notification (id, title, message, importance, created_at) 
-      VALUES (?, ?, ?, ?, ?);`;
-
-    dbConn.query(
-      QUERY,
-      [id, title, message, importanceResolver.get(importance), createAt],
-      (err, result) => {
-        if (err) throw err;
-
-        const QUERY = `SELECT user.id as user_id
-          FROM user, user_grade as ug
-          WHERE user_grade_id = ug.id 
-            AND grade = ?;`;
-
-        dbConn.query(QUERY, [grade], (err, result) => {
-          if (err) throw err;
-
-          let values = [];
-          result.forEach(({ user_id }) => values.push([user_id, id, 100]));
-
-          const QUERY = `INSERT INTO 
-            user_notification (user_id, notification_id, notification_status_id)
-            VALUES ?;`;
-
-          dbConn.query(QUERY, [values], (err, result: User[]) => {
-            if (err) throw err;
-          });
-        });
-      }
-    );
-  });
+  redisClient.on(REDIS_MESSAGE, handler.redisMessageHandler({ dbConn }));
 
   redisClient.subscribe(EVENT_NOTIFICATION);
 };

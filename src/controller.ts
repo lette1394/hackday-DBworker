@@ -80,11 +80,12 @@ export const registerRestHandler = ({ app, dbConn }) => {
     const { id, read } = req.body;
 
     const QUERY = `UPDATE user_notification
-      SET notification_status_id=?
-      WHERE notification_id=?`;
+      SET notification_status_id = ?
+      WHERE notification_id = ?`;
 
     excuteQuery({ dbConn, QUERY, params: [200, id] })
       .then(() => res.status(200).send())
       .catch(() => res.status(400).send());
   });
 };
+ 
