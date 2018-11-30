@@ -13,7 +13,7 @@ export enum UserGrade {
 }
 
 export interface Notification {
-  key: string;
+  id: string;
   title: string;
   message: string;
   importance: NotificationImportance;
